@@ -1,5 +1,6 @@
 package com.phoemphanith.blogserviceapibasic.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 
 @Entity
@@ -14,5 +15,8 @@ class Post(
     @Column(nullable = false)
     var title: String? = null,
     var description: String? = null,
-    var content: String? = null
+    var content: String? = null,
+    @OneToMany(mappedBy = "post", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
+    var comment: Set<Comment> = HashSet()
 )

@@ -3,6 +3,7 @@ package com.phoemphanith.blogserviceapibasic.controller
 import com.phoemphanith.blogserviceapibasic.payload.PaginateResponse
 import com.phoemphanith.blogserviceapibasic.payload.PostDTO
 import com.phoemphanith.blogserviceapibasic.service.PostService
+import com.phoemphanith.blogserviceapibasic.utils.AppConstant
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("api/posts")
+@RequestMapping(AppConstant.MAIN_ENDPOINT + "/posts")
 class PostController {
     @Autowired
     lateinit var postService: PostService

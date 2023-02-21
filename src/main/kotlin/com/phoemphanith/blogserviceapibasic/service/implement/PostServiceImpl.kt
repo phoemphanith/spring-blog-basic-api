@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrElse
@@ -50,8 +51,9 @@ class PostServiceImpl: PostService {
     }
 
     override fun showPostDetail(id: Long): PostDTO? {
-        val post = postRepository.findById(id).get()
-        return PostDTO(post.id, post.title, post.description, post.content)
+        return postRepository.findByIdOrNull(id).let {
+            PostDTO(it?.id, it?.title, it?.description, it?.content)
+        }
     }
 
     override fun updatePost(id: Long, payload: PostDTO): PostDTO? {
