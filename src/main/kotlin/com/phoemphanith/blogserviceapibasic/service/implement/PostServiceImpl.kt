@@ -6,15 +6,11 @@ import com.phoemphanith.blogserviceapibasic.payload.PostDTO
 import com.phoemphanith.blogserviceapibasic.repository.PostRepository
 import com.phoemphanith.blogserviceapibasic.service.PostService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrDefault
-import kotlin.jvm.optionals.getOrElse
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class PostServiceImpl: PostService {
