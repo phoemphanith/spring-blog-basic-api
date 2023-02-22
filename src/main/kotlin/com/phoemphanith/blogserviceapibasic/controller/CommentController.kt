@@ -1,6 +1,7 @@
 package com.phoemphanith.blogserviceapibasic.controller
 
 import com.phoemphanith.blogserviceapibasic.payload.CommentDTO
+import com.phoemphanith.blogserviceapibasic.payload.response.ResponseObjectMap
 import com.phoemphanith.blogserviceapibasic.service.CommentService
 import com.phoemphanith.blogserviceapibasic.utils.AppConstant
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,20 +20,22 @@ import org.springframework.web.bind.annotation.RestController
 class CommentController {
     @Autowired
     lateinit var commentService: CommentService
+    @Autowired
+    lateinit var response: ResponseObjectMap
 
     @PostMapping
-    fun create(@PathVariable postId: Long, @RequestBody payload: CommentDTO): ResponseEntity<CommentDTO>{
-        return ResponseEntity.ok().body(commentService.createComment(postId, payload))
+    fun create(@PathVariable postId: Long, @RequestBody payload: CommentDTO): MutableMap<String, Any?>{
+        return response.body(commentService.createComment(postId, payload))
     }
 
     @GetMapping
-    fun list(@PathVariable postId: Long): ResponseEntity<List<CommentDTO>>{
-        return ResponseEntity.ok().body(commentService.listAllComment(postId))
+    fun list(@PathVariable postId: Long): MutableMap<String, Any>{
+        return response.list(commentService.listAllComment(postId))
     }
 
     @GetMapping("/{commentId}")
-    fun show(@PathVariable postId: Long, @PathVariable commentId: Long): ResponseEntity<CommentDTO>{
-        return ResponseEntity.ok().body(commentService.showCommentDetail(postId, commentId))
+    fun show(@PathVariable postId: Long, @PathVariable commentId: Long): MutableMap<String, Any?>{
+        return response.body(commentService.showCommentDetail(postId, commentId))
     }
 
     @PutMapping("/{commentId}")
@@ -40,15 +43,15 @@ class CommentController {
         @PathVariable postId: Long,
         @PathVariable commentId: Long,
         @RequestBody commentDTO: CommentDTO
-    ): ResponseEntity<CommentDTO>{
-        return ResponseEntity.ok().body(commentService.updateComment(commentId, postId, commentDTO))
+    ): MutableMap<String, Any?>{
+        return response.body(commentService.updateComment(commentId, postId, commentDTO))
     }
 
     @DeleteMapping("/{commentId}")
     fun delete(
         @PathVariable postId: Int,
         @PathVariable commentId: Long,
-    ): ResponseEntity<Boolean>{
-        return ResponseEntity.ok().body(commentService.deleteComment(commentId))
+    ): MutableMap<String, Any?>{
+        return response.body(commentService.deleteComment(commentId))
     }
 }

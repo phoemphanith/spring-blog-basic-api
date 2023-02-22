@@ -1,4 +1,4 @@
-package com.phoemphanith.blogserviceapibasic.payload
+package com.phoemphanith.blogserviceapibasic.payload.response
 
 class PaginateResponse(
     var results: List<Any?>? = emptyList(),

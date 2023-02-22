@@ -1,11 +1,15 @@
 package com.phoemphanith.blogserviceapibasic.service.implement
 
 import com.phoemphanith.blogserviceapibasic.entity.Post
-import com.phoemphanith.blogserviceapibasic.payload.PaginateResponse
+import com.phoemphanith.blogserviceapibasic.exception.CustomException
+import com.phoemphanith.blogserviceapibasic.payload.response.PaginateResponse
 import com.phoemphanith.blogserviceapibasic.payload.PostDTO
 import com.phoemphanith.blogserviceapibasic.repository.PostRepository
 import com.phoemphanith.blogserviceapibasic.service.PostService
+import com.phoemphanith.blogserviceapibasic.payload.enumerate.HttpCode
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service
 class PostServiceImpl: PostService {
     @Autowired
     lateinit var postRepository: PostRepository
+    val mapper: ModelMapper = ModelMapper()
 
     override fun createPost(payload: PostDTO): PostDTO? {
         var newPost = Post(
@@ -24,49 +29,47 @@ class PostServiceImpl: PostService {
             content = payload.content
         )
         val post = postRepository.save(newPost)
-        return PostDTO(post.id, post.title, post.description, post.content)
+        return mapper.map(post, PostDTO::class.java)
     }
 
-    override fun listAllPosts(): List<PostDTO>? {
-        return postRepository.findAll().map { PostDTO(it.id, it.title, it.description, it.content) }
+    override fun listAllPosts(): List<PostDTO> {
+        return postRepository.findAll().map { mapper.map(it, PostDTO::class.java) }
     }
 
-    override fun paginationPostList(page: Int, size: Int): PaginateResponse {
+    override fun paginationPostList(page: Int, size: Int): Page<PostDTO> {
         val sort = Sort.by("id").descending()
         val pageParam: Pageable = PageRequest.of(page, size, sort)
-        val posts = postRepository.findAll(pageParam)
-
-        return PaginateResponse(
-            results = posts.content,
-            pageNo = page,
-            pageSize = size,
-            totalElements = posts.totalElements,
-            totalPages = posts.totalPages,
-            last = posts.isLast
-        )
+        return postRepository.findAll(pageParam).map { mapper.map(it, PostDTO::class.java) }
     }
 
     override fun showPostDetail(id: Long): PostDTO? {
-        return postRepository.findByIdOrNull(id).let {
-            PostDTO(it?.id, it?.title, it?.description, it?.content)
-        }
+        val post = postRepository.findByIdOrNull(id)
+            ?: throw CustomException(HttpCode.NOT_FOUND, "Post given by $id was not found.")
+        return mapper.map(post, PostDTO::class.java)
     }
 
     override fun updatePost(id: Long, payload: PostDTO): PostDTO? {
-        val post = postRepository.findById(id).get()
+        return try {
+            val post = postRepository.findById(id).get()
 
-        post.title = payload.title
-        post.description = payload.description
-        post.content = payload.content
+            post.title = payload.title
+            post.description = payload.description
+            post.content = payload.content
 
-        val newPost = postRepository.save(post)
+            val newPost = postRepository.save(post)
 
-        return PostDTO(newPost.id, newPost.title, newPost.description, newPost.content)
+            mapper.map(newPost, PostDTO::class.java)
+        }catch (ex: RuntimeException){
+            throw CustomException(HttpCode.BAD_REQUEST, ex.message.toString())
+        }
     }
 
     override fun deletePost(id: Long): Any? {
-        postRepository.findById(id).orElseThrow() ?: return false
-        postRepository.deleteById(id)
-        return true
+        return try {
+            postRepository.deleteById(id)
+            1
+        }catch (ex: RuntimeException){
+            throw CustomException(HttpCode.NOT_FOUND, ex.message.toString())
+        }
     }
 }

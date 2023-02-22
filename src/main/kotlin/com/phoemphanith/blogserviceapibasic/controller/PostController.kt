@@ -1,7 +1,7 @@
 package com.phoemphanith.blogserviceapibasic.controller
 
-import com.phoemphanith.blogserviceapibasic.payload.PaginateResponse
 import com.phoemphanith.blogserviceapibasic.payload.PostDTO
+import com.phoemphanith.blogserviceapibasic.payload.response.ResponseObjectMap
 import com.phoemphanith.blogserviceapibasic.service.PostService
 import com.phoemphanith.blogserviceapibasic.utils.AppConstant
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,29 +22,33 @@ import org.springframework.web.bind.annotation.RestController
 class PostController {
     @Autowired
     lateinit var postService: PostService
+    @Autowired
+    lateinit var response: ResponseObjectMap
 
     @PostMapping
-    fun create(@RequestBody post: PostDTO) = ResponseEntity<PostDTO>(postService.createPost(post), HttpStatus.CREATED)
+    fun create(@RequestBody post: PostDTO): MutableMap<String, Any?> {
+        return response.body(postService.createPost(post))
+    }
 
     @GetMapping
-    fun list() = ResponseEntity<List<PostDTO>>(postService.listAllPosts(), HttpStatus.OK)
+    fun list() = response.list(postService.listAllPosts())
 
     @GetMapping("/list")
     fun paginate(
         @RequestParam(name = "page", defaultValue = "0", required = false) page: Int,
         @RequestParam(name = "size", defaultValue = "10", required = false) size: Int
-    ): PaginateResponse{
-        return postService.paginationPostList(page, size)
+    ): MutableMap<String, Any> {
+        return response.paginate(postService.paginationPostList(page, size), page, size)
     }
 
     @GetMapping("/{id}")
-    fun detail(@PathVariable id: Long) = ResponseEntity<PostDTO>(postService.showPostDetail(id), HttpStatus.OK)
+    fun detail(@PathVariable id: Long) = response.body(postService.showPostDetail(id))
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody post: PostDTO): ResponseEntity<PostDTO>{
-        return ResponseEntity<PostDTO>(postService.updatePost(id, post), HttpStatus.OK)
+    fun update(@PathVariable id: Long, @RequestBody post: PostDTO): MutableMap<String, Any?>{
+        return response.body(postService.updatePost(id, post))
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long) = ResponseEntity<Any>(postService.deletePost(id), HttpStatus.OK)
+    fun delete(@PathVariable id: Long) = response.body(postService.deletePost(id))
 }
