@@ -4,6 +4,7 @@ import com.phoemphanith.blogserviceapibasic.payload.CommentDTO
 import com.phoemphanith.blogserviceapibasic.payload.response.ResponseObjectMap
 import com.phoemphanith.blogserviceapibasic.service.CommentService
 import com.phoemphanith.blogserviceapibasic.utils.AppConstant
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -24,7 +25,10 @@ class CommentController {
     lateinit var response: ResponseObjectMap
 
     @PostMapping
-    fun create(@PathVariable postId: Long, @RequestBody payload: CommentDTO): MutableMap<String, Any?>{
+    fun create(
+        @PathVariable postId: Long,
+        @Valid @RequestBody payload: CommentDTO
+    ): MutableMap<String, Any?>{
         return response.body(commentService.createComment(postId, payload))
     }
 
@@ -34,7 +38,10 @@ class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    fun show(@PathVariable postId: Long, @PathVariable commentId: Long): MutableMap<String, Any?>{
+    fun show(
+        @PathVariable postId: Long,
+        @PathVariable commentId: Long
+    ): MutableMap<String, Any?>{
         return response.body(commentService.showCommentDetail(postId, commentId))
     }
 
@@ -42,7 +49,7 @@ class CommentController {
     fun update(
         @PathVariable postId: Long,
         @PathVariable commentId: Long,
-        @RequestBody commentDTO: CommentDTO
+        @Valid @RequestBody commentDTO: CommentDTO
     ): MutableMap<String, Any?>{
         return response.body(commentService.updateComment(commentId, postId, commentDTO))
     }

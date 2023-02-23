@@ -4,6 +4,7 @@ import com.phoemphanith.blogserviceapibasic.payload.PostDTO
 import com.phoemphanith.blogserviceapibasic.payload.response.ResponseObjectMap
 import com.phoemphanith.blogserviceapibasic.service.PostService
 import com.phoemphanith.blogserviceapibasic.utils.AppConstant
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,7 +27,7 @@ class PostController {
     lateinit var response: ResponseObjectMap
 
     @PostMapping
-    fun create(@RequestBody post: PostDTO): MutableMap<String, Any?> {
+    fun create(@Valid @RequestBody post: PostDTO): MutableMap<String, Any?> {
         return response.body(postService.createPost(post))
     }
 
@@ -45,7 +46,10 @@ class PostController {
     fun detail(@PathVariable id: Long) = response.body(postService.showPostDetail(id))
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody post: PostDTO): MutableMap<String, Any?>{
+    fun update(
+        @PathVariable id: Long,
+        @Valid @RequestBody post: PostDTO
+    ): MutableMap<String, Any?>{
         return response.body(postService.updatePost(id, post))
     }
 
