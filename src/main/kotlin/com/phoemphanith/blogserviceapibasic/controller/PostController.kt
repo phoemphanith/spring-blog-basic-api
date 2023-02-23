@@ -8,6 +8,7 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,6 +27,7 @@ class PostController {
     @Autowired
     lateinit var response: ResponseObjectMap
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     fun create(@Valid @RequestBody post: PostDTO): MutableMap<String, Any?> {
         return response.body(postService.createPost(post))
@@ -45,6 +47,7 @@ class PostController {
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long) = response.body(postService.showPostDetail(id))
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     fun update(
         @PathVariable id: Long,
@@ -53,6 +56,7 @@ class PostController {
         return response.body(postService.updatePost(id, post))
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long) = response.body(postService.deletePost(id))
 }
