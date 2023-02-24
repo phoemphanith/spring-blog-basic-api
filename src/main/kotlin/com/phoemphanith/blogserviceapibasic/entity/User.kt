@@ -1,5 +1,6 @@
 package com.phoemphanith.blogserviceapibasic.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 
 @Entity
@@ -21,5 +22,6 @@ class User (
         joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")]
     )
+    @JsonIgnore
     var roles: Set<Role>? = HashSet()
 )

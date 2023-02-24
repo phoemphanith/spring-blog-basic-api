@@ -1,6 +1,9 @@
 package com.phoemphanith.blogserviceapibasic.utils
 
+import io.jsonwebtoken.io.Encoders
+import io.jsonwebtoken.security.Keys
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import java.util.Base64.Encoder
 
 class GeneratePassword
 
