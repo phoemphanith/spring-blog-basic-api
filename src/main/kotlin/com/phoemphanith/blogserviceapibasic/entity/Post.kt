@@ -16,7 +16,13 @@ class Post(
     var title: String? = null,
     var description: String? = null,
     var content: String? = null,
+
     @OneToMany(mappedBy = "post", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
-    var comment: Set<Comment> = HashSet()
+    var comment: Set<Comment> = HashSet(),
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    var category: Category? = null
 )

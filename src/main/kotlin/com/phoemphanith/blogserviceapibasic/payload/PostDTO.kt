@@ -10,5 +10,6 @@ class PostDTO(
     @field:Size(min = 10, message = "Description must have at least 10 character")
     var description: String? = null,
     @field:Size(min = 10, message = "Content must have at least 10 character")
-    var content: String? = null
+    var content: String? = null,
+    var categoryId: Long? = null
 )

@@ -1,5 +1,6 @@
 package com.phoemphanith.blogserviceapibasic.service.implement
 
+import com.phoemphanith.blogserviceapibasic.entity.Category
 import com.phoemphanith.blogserviceapibasic.entity.Post
 import com.phoemphanith.blogserviceapibasic.exception.CustomException
 import com.phoemphanith.blogserviceapibasic.payload.response.PaginateResponse
@@ -7,6 +8,7 @@ import com.phoemphanith.blogserviceapibasic.payload.PostDTO
 import com.phoemphanith.blogserviceapibasic.repository.PostRepository
 import com.phoemphanith.blogserviceapibasic.service.PostService
 import com.phoemphanith.blogserviceapibasic.payload.enumerate.HttpCode
+import com.phoemphanith.blogserviceapibasic.repository.CategoryRepository
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -15,11 +17,14 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class PostServiceImpl: PostService {
     @Autowired
     lateinit var postRepository: PostRepository
+    @Autowired
+    lateinit var categoryRepository: CategoryRepository
     val mapper: ModelMapper = ModelMapper()
 
     override fun createPost(payload: PostDTO): PostDTO? {
@@ -28,7 +33,15 @@ class PostServiceImpl: PostService {
             description = payload.description,
             content = payload.content
         )
+
+        if(payload.categoryId != null){
+            val category = categoryRepository.findById(payload.categoryId!!).orElse(null)
+                ?: throw CustomException(HttpCode.NOT_FOUND, "Category given by id ${payload.categoryId} not found")
+            newPost.category = category
+        }
+
         val post = postRepository.save(newPost)
+
         return mapper.map(post, PostDTO::class.java)
     }
 
@@ -51,16 +64,21 @@ class PostServiceImpl: PostService {
     override fun updatePost(id: Long, payload: PostDTO): PostDTO? {
         return try {
             val post = postRepository.findById(id).get()
+            val newPost = Post()
 
-            post.title = payload.title
-            post.description = payload.description
-            post.content = payload.content
+            newPost.title = payload.title
+            newPost.description = payload.description
+            newPost.content = payload.content
 
-            val newPost = postRepository.save(post)
-
-            mapper.map(newPost, PostDTO::class.java)
+            if(payload.categoryId != null){
+                val category = categoryRepository.findById(payload.categoryId!!).orElse(null)
+                    ?: throw CustomException(HttpCode.NOT_FOUND, "Category given by id ${payload.categoryId} not found")
+                newPost.category = category
+            }
+            
+            mapper.map(postRepository.save(newPost), PostDTO::class.java)
         }catch (ex: RuntimeException){
-            throw CustomException(HttpCode.BAD_REQUEST, ex.message.toString())
+            throw CustomException(HttpCode.BAD_REQUEST, ex.localizedMessage)
         }
     }
 
